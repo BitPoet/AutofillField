@@ -1,0 +1,32 @@
+<?php
+
+/**
+ * Field that is automatically filled according to the configured pattern when the page containing it is saved
+ *
+ * (c) 2017 the.bitpoet@gmail.com
+ *
+ * Released under Mozilla Public License v2.0
+ * 
+ */
+
+class FieldtypeAutofillField extends FieldtypeText implements Module {
+	
+	public static function getModuleInfo() {
+		return array(
+			"title"				=>	"Fieldtype Autofill Field",
+			"summary"			=>	"Field that is automatically filled according to the configured pattern when the page containing it is saved.",
+			"version"			=>	"0.0.1",
+			"autoload"			=>	"true",
+		);
+	}	
+	
+	public function init() {
+		parent::init();
+	}
+	
+    public function getInputfield(Page $page, Field $field) {
+        $inputField = $this->modules->get('InputfieldAutofillField');
+        return $inputField;
+    }
+
+}

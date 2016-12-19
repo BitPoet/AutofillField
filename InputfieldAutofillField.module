@@ -1,0 +1,40 @@
+<?php
+
+/**
+ * Field that is automatically filled according to the configured pattern when the page containing it is saved
+ *
+ * (c) 2017 the.bitpoet@gmail.com
+ *
+ * Released under Mozilla Public License v2.0
+ * 
+ */
+
+class InputfieldAutofillField extends InputfieldText implements Module {
+	
+	public static function getModuleInfo() {
+		return array(
+			"title"				=>	"Inputfield Autofill Field",
+			"summary"			=>	"Field that is automatically filled according to the configured pattern when the page containing it is saved.",
+			"version"			=>	"0.0.1",
+		);
+	}	
+	
+	public function __construct() {
+		parent::__construct();
+		$this->collapsed = Inputfield::collapsedNoLocked;
+		$this->set("autofillpattern", "");
+	}
+
+	public function ___getConfigInputfields() {
+		$inputfields = parent::___getConfigInputfields();
+		
+		$f = $this->modules->get("InputfieldText");
+		$f->attr('id+name', "autofillpattern");
+		$f->label = $this->_("Autofill Pattern");
+		$f->description = $this->_("Enter a text pattern for this field. Reference other field values by placing their names in curly braces, e.g. '{name}, {title}'. The value will be updated every time the page containing this field is saved.");
+		$f->attr('value', $this->autofillpattern);
+		$inputfields->append($f);
+		
+		return $inputfields;
+	}
+}

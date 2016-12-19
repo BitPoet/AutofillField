@@ -1,0 +1,47 @@
+<?php
+
+/**
+ * Hooks for automatic filling of fields of type InputfieldAutofillField at page save time
+ *
+ * (c) 2017 the.bitpoet@gmail.com
+ *
+ * Released under Mozilla Public License v2.0
+ *
+ */
+
+class AutofillFieldHooks extends WireData implements Module {
+
+	public static function getModuleInfo() {
+		return array(
+			"title"				=>	"Hooks for Autofill Field",
+			"summary"			=>	"Field that is automatically filled according to the configured pattern when the page containing it is saved.",
+			"version"			=>	"0.0.1",
+			"installs"			=>	array("FieldtypeAutofillField", "InputfieldAutofillField"),
+			"autoload"			=>	true,
+		);
+	}	
+	
+	public function init() {
+		$this->addHookAfter("Pages::saveReady", $this, "hookPagesSaveReady_generateFields");
+	}
+	
+	public function hookPagesSaveReady_generateFields(HookEvent $event) {
+		$page = $event->arguments(0);
+		
+		foreach($page->fields as $field) {
+			if($field->type instanceof FieldtypeAutofillField) {
+				$fname = $field->name;
+				$page->set($fname, self::runPattern($page, $field->autofillpattern));
+			}
+		}
+	}
+	
+	private static function runPattern($page, $pattern) {
+		while(preg_match('/\\{([^}]+)\\}/', $pattern)) {
+			$pattern = preg_replace_callback('/\\{([^}]+)\\}/', function($match) use($page) {
+				return $page->{$match[1]};
+			}, $pattern);
+		}
+		return $pattern;
+	}
+}
